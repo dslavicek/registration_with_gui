@@ -1,0 +1,7 @@
+# ignore images
+*.jpg
+*.jpeg
+*.png
+*.tif
+__pycache__
+.idea
