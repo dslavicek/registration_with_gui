@@ -4,14 +4,16 @@ import torch.nn.functional as F
 
 
 class SampleCreator:
-    def __init__(self, path, verbose=False):
-        self.path = path
+    def __init__(self, input_images, verbose=False, from_path=True):
         self.verbose = verbose
         self.datatype = torch.float32
         self.x_shifts = [-0.1, 0, 1]
         self.y_shifts = [-0.1, 0, 1]
         self.rotations_deg = [-1, 0, 1]
-        self.input_tensor = lit.load_grayscale_from_folder(path)
+        if from_path:
+            self.input_tensor = lit.load_grayscale_from_folder(input_images)
+        else:
+            self.input_tensor = input_images
         self.batch_size = self.input_tensor.shape[0]
         self.height = self.input_tensor.shape[2]
         self.width = self.input_tensor.shape[3]

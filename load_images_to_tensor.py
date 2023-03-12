@@ -17,7 +17,7 @@ def load_grayscale_from_folder(path, datatype=torch.float32):
 
     for i, f in enumerate(all_files):
         im = skimage.io.imread(os.path.join(path, f))
-        output_tensor[i, 0, :, :] = torch.tensor(im, dtype=datatype) / 256
+        output_tensor[i, 0, :, :] = torch.tensor(im, dtype=datatype) / 255
     return output_tensor
 
 
