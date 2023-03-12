@@ -5,3 +5,4 @@
 *.tif
 __pycache__
 .idea
+tmp.py

@@ -27,7 +27,6 @@ def load_rgb_from_folder(path, datatype=torch.float32):
     # function loads all images in folder to tensor of size number_of_images x 1 x height x width of the image
     all_files = os.listdir(path)
     im = skimage.io.imread(os.path.join(path, all_files[0]))
-    print(im.shape)
     height = im.shape[0]
     width = im.shape[1]
     batch_size = len(all_files)
@@ -39,17 +38,20 @@ def load_rgb_from_folder(path, datatype=torch.float32):
     return output_tensor
 
 
-def display_fst_image_from_tensor(tensor):
+def display_nth_image_from_tensor(tensor, n=0):
     # this function displays first image from tensor
-    tensor_image = tensor[0].view(tensor.shape[2], tensor.shape[3], tensor.shape[1])
+    if tensor.shape[0] < n-1:
+        print("Error: tensor does not have " + str(n) + " images")
+        return 1
+    tensor_image = tensor[n].view(tensor.shape[2], tensor.shape[3], tensor.shape[1])
     plt.imshow(tensor_image)
     plt.show()
+    return 0
 
 
 def load_grayscale(path, datatype=torch.float32):
     # function loads image to a tensor of size 1 x 1 x height x width
     im = skimage.io.imread(path)
-    print(im.shape)
     height = im.shape[0]
     width = im.shape[1]
     output_tensor = torch.empty((1, 1, height, width), dtype=datatype)
