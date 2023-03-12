@@ -1,11 +1,10 @@
 import os
-import numpy as np
 import skimage.io
 import torch
 import matplotlib.pyplot as plt
 
 
-def load_grayscale_images_to_tensor(path, datatype=torch.float32):
+def load_grayscale_from_folder(path, datatype=torch.float32):
     # function takes a path to folder with images
     # requires only grayscale images of the same size to be present in that folder
     # function loads all images in folder to tensor of size number_of_images x 1 x height x width of the image
@@ -22,7 +21,7 @@ def load_grayscale_images_to_tensor(path, datatype=torch.float32):
     return output_tensor
 
 
-def load_rgb_images_to_tensor(path, datatype=torch.float32):
+def load_rgb_from_folder(path, datatype=torch.float32):
     # function takes a path to folder with images
     # requires only rgb images of the same size to be present in that folder
     # function loads all images in folder to tensor of size number_of_images x 1 x height x width of the image
@@ -45,3 +44,25 @@ def display_fst_image_from_tensor(tensor):
     tensor_image = tensor[0].view(tensor.shape[2], tensor.shape[3], tensor.shape[1])
     plt.imshow(tensor_image)
     plt.show()
+
+
+def load_grayscale(path, datatype=torch.float32):
+    # function loads image to a tensor of size 1 x 1 x height x width
+    im = skimage.io.imread(path)
+    print(im.shape)
+    height = im.shape[0]
+    width = im.shape[1]
+    output_tensor = torch.empty((1, 1, height, width), dtype=datatype)
+    output_tensor[0, 0, :, :] = torch.tensor(im, dtype=datatype) / 255
+    return output_tensor
+
+
+def load_rgb(path, datatype=torch.float32):
+    # function loads image to a tensor of size 1 x 3 x height x width
+    im = skimage.io.imread(path)
+    height = im.shape[0]
+    width = im.shape[1]
+    output_tensor = torch.empty((1, 3, height, width), dtype=datatype)
+    im_tensor = torch.tensor(im, dtype=datatype) / 255
+    output_tensor[0, :, :, :] = im_tensor.view(im_tensor.shape[2], im_tensor.shape[0], im_tensor.shape[1])
+    return output_tensor
