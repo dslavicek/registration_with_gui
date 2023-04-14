@@ -1,6 +1,13 @@
 import torch
 import torch.nn.functional as F
+
+
 def grayscale_registration(ref, sample, max_iters=120, mu=0.02, datatype=torch.float32, verbose=False):
+    # this function performs registration of two 4D pytorch tensors
+    # inputs - reference tensor, tensor of moving images, max. number of iterations, size of registration step,
+    # datatype, verbose mode
+    # output - dictionary containing tensor of registered images, shifts in x,y, rotations, transformation matrices,
+    # loss function
     if verbose:
         print("Begining registration")
     if ref.shape != sample.shape:
