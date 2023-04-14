@@ -2,6 +2,7 @@ import os
 from PyQt6 import QtGui, uic
 from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QTextEdit, QFileDialog, QMainWindow
 from register_two_images import register_two_images
+from register_multiple_images import register_multiple_images, make_csv_from_reg_dict
 
 import skimage.io
 import torch
@@ -10,19 +11,6 @@ import numpy as np
 
 
 class Application(object):
-    # def __init__(self, app):
-    #     self.registration_window = None
-    #     self.results_window = None
-    #     self.window = QMainWindow()
-    #     self.ui = uic.loadUi('ui\\mainwindow.ui', self.window)
-    #     self.app = app
-    #     self.ui.register_two_images.clicked.connect(self.register_two)
-    #     self.ui.register_dataset.clicked.connect(self.register_dataset)
-    #     print("initializing")
-    #     print(self.ui)
-    #     # self.ui.show()
-    #     self.window.show()
-    #     self.run()
 
     def __init__(self, app):
         self.registration_window = None
@@ -101,7 +89,48 @@ class Application(object):
         skimage.io.imsave(path[0], image)
 
     def register_dataset(self):
+        self.registration_window = uic.loadUi('ui\\register_datasets.ui', self.window)
+        self.registration_window.select_reference.clicked.connect(self.browse_reference_dataset)
+        self.registration_window.select_sample.clicked.connect(self.browse_sample_dataset)
+        self.registration_window.select_output.clicked.connect(self.browse_results_folder)
+        self.registration_window.register_datasets.clicked.connect(self.perform_dataset_registration)
         pass
+
+    def browse_reference_dataset(self):
+        answer = QFileDialog.getExistingDirectory(
+            parent=self.window,
+            caption='Select reference folder',
+            directory=os.getcwd()
+        )
+        print(answer)
+        self.registration_window.reference_line_edit.clear()
+        self.registration_window.reference_line_edit.insert(str(answer))
+
+    def browse_sample_dataset(self):
+        answer = QFileDialog.getExistingDirectory(
+            parent=self.window,
+            caption='Select moving images folder',
+            directory=os.getcwd()
+        )
+        print(answer)
+        self.registration_window.sample_line_edit.clear()
+        self.registration_window.sample_line_edit.insert(str(answer))
+
+    def browse_results_folder(self):
+        answer = QFileDialog.getExistingDirectory(
+            parent=self.window,
+            caption='Select folder for results',
+            directory=os.getcwd()
+        )
+        print(answer)
+        self.registration_window.output_line_edit.clear()
+        self.registration_window.output_line_edit.insert(str(answer))
+
+    def perform_dataset_registration(self):
+        results_dict = register_multiple_images(self.registration_window.reference_line_edit.text(),
+                                                self.registration_window.sample_line_edit.text())
+        print("dataset registration finished")
+        make_csv_from_reg_dict(results_dict, self.registration_window.output_line_edit.text())
 
     def perform_registration(self):
         # call function that registers images

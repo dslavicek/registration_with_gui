@@ -2,7 +2,7 @@ import torch
 import load_images_to_tensor as lit
 import torch.nn.functional as F
 
-
+# class for generating synthetic samples for registration
 class SampleCreator:
     def __init__(self, input_images, verbose=False, from_path=True):
         self.verbose = verbose
