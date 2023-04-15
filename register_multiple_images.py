@@ -20,4 +20,7 @@ def make_csv_from_reg_dict(registration_dict, output_path):
     data = np.stack((x, y, angle), axis=1)
     data = np.transpose(data)
     result = pd.DataFrame(data)
+    print("X")
     result.to_csv(os.path.join(output_path, "result.csv"))
+    result.to_csv(os.path.join(output_path, "result2.csv"), index=False)
+    result.to_csv(os.path.join(output_path, "result3.csv"), header=["x shift", "y shift", "angle"], index=False)
