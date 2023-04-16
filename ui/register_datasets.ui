@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>250</y>
+      <y>280</y>
       <width>131</width>
       <height>20</height>
      </rect>
@@ -44,7 +44,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>270</y>
+      <y>300</y>
       <width>341</width>
       <height>25</height>
      </rect>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>210</y>
+      <y>240</y>
       <width>341</width>
       <height>25</height>
      </rect>
@@ -64,7 +64,7 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>190</y>
+      <y>220</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -77,7 +77,7 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>270</y>
+      <y>300</y>
       <width>93</width>
       <height>29</height>
      </rect>
@@ -90,7 +90,7 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>210</y>
+      <y>240</y>
       <width>93</width>
       <height>29</height>
      </rect>
@@ -99,40 +99,17 @@
      <string>Vyber</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="output_line_edit">
+   <widget class="QPushButton" name="main_menu">
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>330</y>
-      <width>341</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="select_output">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>330</y>
-      <width>93</width>
+      <y>430</y>
+      <width>161</width>
       <height>29</height>
      </rect>
     </property>
     <property name="text">
-     <string>Vyber</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>310</y>
-      <width>131</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Složka na výsledky</string>
+     <string>Zpět do hlavního menu</string>
     </property>
    </widget>
   </widget>
@@ -142,7 +119,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

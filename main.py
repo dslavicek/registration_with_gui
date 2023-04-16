@@ -19,9 +19,8 @@ class Application(object):
         self.window = QMainWindow()
         self.app = app
         self.load_main_menu()
+        self.dataset_reg_results = None
 
-        # self.ui.show()
-        # self.window.show()
         self.run()
 
     def run(self):
@@ -43,8 +42,8 @@ class Application(object):
         self.results_window.main_menu.clicked.connect(self.load_main_menu)
         self.results_window.save_result.clicked.connect(lambda: self.save_registered_image(registered_im))
         self.window.show()
-        pass
 
+    # creates window where user selects two images to be registered
     def register_two(self):
         self.registration_window = uic.loadUi('ui\\register_two_images_mw.ui', self.window)
         self.registration_window.select_reference.clicked.connect(self.browse_reference)
@@ -55,6 +54,7 @@ class Application(object):
         # self.registration_window.reference_line_edit.insert("Zde bude cesta k referenci.")
         self.registration_window.show()
 
+    # opens dialog to select reference image for registration
     def browse_reference(self):
         im_filter = 'Images (*.jpg *.jpeg *.png *.tif *.bmp)'
         answer = QFileDialog.getOpenFileName(
@@ -67,6 +67,7 @@ class Application(object):
         self.registration_window.reference_line_edit.clear()
         self.registration_window.reference_line_edit.insert(str(answer[0]))
 
+    # opens dialog to select moving image for registration
     def browse_sample(self, write_to):
         im_filter = 'Images (*.jpg *.jpeg *.png *.tif *.bmp)'
         answer = QFileDialog.getOpenFileName(
@@ -88,14 +89,16 @@ class Application(object):
         print(path[0])
         skimage.io.imsave(path[0], image)
 
+    # creates window where user selects datasets for registration
     def register_dataset(self):
         self.registration_window = uic.loadUi('ui\\register_datasets.ui', self.window)
         self.registration_window.select_reference.clicked.connect(self.browse_reference_dataset)
         self.registration_window.select_sample.clicked.connect(self.browse_sample_dataset)
-        self.registration_window.select_output.clicked.connect(self.browse_results_folder)
         self.registration_window.register_datasets.clicked.connect(self.perform_dataset_registration)
+        self.registration_window.main_menu.clicked.connect(self.load_main_menu)
         pass
 
+    # allows user to select folder with reference images
     def browse_reference_dataset(self):
         answer = QFileDialog.getExistingDirectory(
             parent=self.window,
@@ -106,6 +109,7 @@ class Application(object):
         self.registration_window.reference_line_edit.clear()
         self.registration_window.reference_line_edit.insert(str(answer))
 
+    # allows user to select folder with moving images
     def browse_sample_dataset(self):
         answer = QFileDialog.getExistingDirectory(
             parent=self.window,
@@ -116,22 +120,35 @@ class Application(object):
         self.registration_window.sample_line_edit.clear()
         self.registration_window.sample_line_edit.insert(str(answer))
 
-    def browse_results_folder(self):
-        answer = QFileDialog.getExistingDirectory(
+    # performs registration of multiple pairs of images
+    def perform_dataset_registration(self):
+        self.dataset_reg_results = register_multiple_images(self.registration_window.reference_line_edit.text(),
+                                                            self.registration_window.sample_line_edit.text())
+        print("dataset registration finished")
+        self.load_dataset_reg_results_window()
+
+    # displays window of dataset registration results
+    # - currently just mention, that registration is completed and possibility to save results
+    def load_dataset_reg_results_window(self):
+        uic.loadUi('ui\\dataset_save.ui', self.window)
+        self.window.file_saved_label.setHidden(True)
+        self.window.main_menu.clicked.connect(self.load_main_menu)
+        self.window.save_result.clicked.connect(self.save_dataset_reg_result)
+        self.window.show()
+
+    # saves results of dataset registration to csv
+    # the csv contains translations in x and y and rotations
+    def save_dataset_reg_result(self):
+        path = QFileDialog.getSaveFileName(
             parent=self.window,
-            caption='Select folder for results',
+            caption='Save CSV with results',
             directory=os.getcwd()
         )
-        print(answer)
-        self.registration_window.output_line_edit.clear()
-        self.registration_window.output_line_edit.insert(str(answer))
+        print(path[0])
+        make_csv_from_reg_dict(self.dataset_reg_results, path[0])
+        self.window.file_saved_label.setHidden(False)
 
-    def perform_dataset_registration(self):
-        results_dict = register_multiple_images(self.registration_window.reference_line_edit.text(),
-                                                self.registration_window.sample_line_edit.text())
-        print("dataset registration finished")
-        make_csv_from_reg_dict(results_dict, self.registration_window.output_line_edit.text())
-
+    # performs registration of two images and calls function that shows results
     def perform_registration(self):
         # call function that registers images
         results_dict = register_two_images(self.registration_window.reference_line_edit.text(),
@@ -147,6 +164,8 @@ class Application(object):
         self.load_reg_results_window(registered_im, width, height)
         self.show_green_purple(self.registration_window.reference_line_edit.text(), registered_im)
 
+    # show comparison of reference and registered image, where reference image is in green color channel
+    # and registered image in red and blue color channels
     def show_green_purple(self, ref_path, result):
         print(ref_path)
         ref = skimage.io.imread(ref_path, as_gray=True)
