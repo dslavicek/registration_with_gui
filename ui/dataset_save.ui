@@ -49,7 +49,7 @@ font-weight: bold;</string>
      <rect>
       <x>210</x>
       <y>220</y>
-      <width>191</width>
+      <width>351</width>
       <height>20</height>
      </rect>
     </property>
@@ -96,7 +96,7 @@ font-weight: bold;</string>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
