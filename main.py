@@ -1,13 +1,14 @@
 import os
 from PyQt6 import QtGui, uic
-from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QTextEdit, QFileDialog, QMainWindow
+from PyQt6.QtWidgets import QApplication, QFileDialog, QMainWindow
 from register_two_images import register_two_images
 from register_multiple_images import register_multiple_images, make_csv_from_reg_dict
-
+from input_output import display_nth_image_from_tensor
 import skimage.io
 import torch
 from matplotlib import pyplot as plt
 import numpy as np
+import logging
 
 
 class Application(object):
@@ -35,10 +36,16 @@ class Application(object):
     # load window with results of registration of two images
     # takes registered image as np.array, its width and height as ints as input
     def load_reg_results_window(self, registered_im, width, height):
+        logging.debug("entered load_reg-results_window")
         self.results_window = uic.loadUi('ui\\registration_of_two_results.ui', self.window)
         if registered_im is not None:
-            QI = QtGui.QImage(registered_im, width, height, QtGui.QImage.Format.Format_Indexed8)
-            self.results_window.registered_image.setPixmap(QtGui.QPixmap.fromImage(QI))
+            if registered_im.ndim == 2:
+                QI = QtGui.QImage(registered_im, width, height, QtGui.QImage.Format.Format_Indexed8)
+                self.results_window.registered_image.setPixmap(QtGui.QPixmap.fromImage(QI))
+            elif registered_im.ndim == 3:
+                logging.debug("noticed image is RGB")
+                QI = QtGui.QImage(registered_im, width, height, QtGui.QImage.Format.Format_RGB888)
+                self.results_window.registered_image.setPixmap(QtGui.QPixmap.fromImage(QI))
         self.results_window.main_menu.clicked.connect(self.load_main_menu)
         self.results_window.save_result.clicked.connect(lambda: self.save_registered_image(registered_im))
         self.window.show()
@@ -157,12 +164,25 @@ class Application(object):
         registered_tens = results_dict["registered_tens"]
         width = registered_tens.shape[2]
         height = registered_tens.shape[3]
-        registered_tens = torch.reshape(registered_tens, (width, height))
-        registered_im = np.array(registered_tens)
-        registered_im = (registered_im * 255).astype(np.uint8)
-        # display registered image
+        # if image is grayscale
+        if registered_tens.shape[1] == 1:
+            registered_tens = torch.reshape(registered_tens, (width, height))
+            registered_im = np.array(registered_tens)
+            registered_im = (registered_im * 255).astype(np.uint8)
+            # display registered image
+            self.load_reg_results_window(registered_im, width, height)
+            self.show_green_purple(self.registration_window.reference_line_edit.text(), registered_im)
+            return
+        # if image is RGB
+        display_nth_image_from_tensor(registered_tens)
+        registered_tens = (registered_tens * 255).to(torch.uint8)
+        # registered_tens = registered_tens[0, 0, :, :] + \
+        #                   registered_tens[0, 1, :, :] * 256 + \
+        #                   registered_tens[0, 2, :, :] * 256 ** 2
+        registered_tens = registered_tens.permute(0,2,3,1)
+        registered_tens = torch.reshape(registered_tens, (3, width, height))
+        registered_im = np.array(registered_tens).astype(np.uint8)  # TADY POTREBUJU 24 bit cislo misto tri uint8
         self.load_reg_results_window(registered_im, width, height)
-        self.show_green_purple(self.registration_window.reference_line_edit.text(), registered_im)
 
     # show comparison of reference and registered image, where reference image is in green color channel
     # and registered image in red and blue color channels
