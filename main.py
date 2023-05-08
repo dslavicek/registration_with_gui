@@ -45,6 +45,7 @@ class Application(object):
             elif registered_im.ndim == 3:
                 logging.debug("noticed image is RGB")
                 QI = QtGui.QImage(registered_im, width, height, QtGui.QImage.Format.Format_RGB888)
+                self.results_window.registered_image.setScaledContents(True)
                 self.results_window.registered_image.setPixmap(QtGui.QPixmap.fromImage(QI))
         self.results_window.main_menu.clicked.connect(self.load_main_menu)
         self.results_window.save_result.clicked.connect(lambda: self.save_registered_image(registered_im))
@@ -94,7 +95,10 @@ class Application(object):
             directory=os.getcwd()
         )
         print(path[0])
-        skimage.io.imsave(path[0], image)
+        if len(image.shape) == 2:
+            skimage.io.imsave(path[0], image)
+        else:
+            skimage.io.imsave(path[0], image.transpose((1, 2, 0)))
 
     # creates window where user selects datasets for registration
     def register_dataset(self):
@@ -179,7 +183,7 @@ class Application(object):
         # registered_tens = registered_tens[0, 0, :, :] + \
         #                   registered_tens[0, 1, :, :] * 256 + \
         #                   registered_tens[0, 2, :, :] * 256 ** 2
-        registered_tens = registered_tens.permute(0,2,3,1)
+        registered_tens = registered_tens.permute(0, 2, 3, 1)
         registered_tens = torch.reshape(registered_tens, (3, width, height))
         registered_im = np.array(registered_tens).astype(np.uint8)  # TADY POTREBUJU 24 bit cislo misto tri uint8
         self.load_reg_results_window(registered_im, width, height)
